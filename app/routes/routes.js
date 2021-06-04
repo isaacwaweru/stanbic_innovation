@@ -14,5 +14,8 @@ module.exports = (app) => {
   
     // Retrieve a single user with usersId
     app.get("/users/:userId", auth, users.findOne);
+
+    // reset password
+    app.post("/reset", users.login);
   };
   
