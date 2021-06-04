@@ -1,5 +1,4 @@
 module.exports = (app) => {
-    const express = require("express");
     const auth = require("../middleware/auth.js");
     const users = require("../controllers/user.controller.js");
   
@@ -16,6 +15,8 @@ module.exports = (app) => {
     app.get("/users/:userId", auth, users.findOne);
 
     // reset password
-    app.post("/reset", users.login);
+    app.post('/forgotPassword', users.forgotPassword);
+
+    app.patch('/resetPassword/:token', users.resetPassword);
   };
   
