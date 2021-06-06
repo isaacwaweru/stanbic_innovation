@@ -1,14 +1,15 @@
 module.exports = (app) => {
     const auth = require("../middleware/auth.js");
     const users = require("../controllers/user.controller.js");
+    const teams = require("../controllers/team.controller.js");
   
-    // Sign up a new user
+    // User sign up
     app.post("/register", users.signup);
 
-    //Account activation
+    //User account activation
     app.put("/activate", users.accountActivation);
 
-    // login
+    // user login
     app.post("/login", users.login);
   
     // Retrieve all users
@@ -17,9 +18,16 @@ module.exports = (app) => {
     // Retrieve a single user with usersId
     app.get("/users/:userId", auth, users.findOne);
 
-    // reset password
+    // User forgot password
     app.post('/forgotPassword', users.forgotPassword);
 
+    //User reset password
     app.patch('/resetPassword', users.resetPassword);
+
+    // Team create 
+    app.post("/team", teams.createTeam);
+
+    // Teams 
+    app.get("/teams", teams.findAll);
   };
   

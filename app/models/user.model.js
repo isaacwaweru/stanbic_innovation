@@ -10,6 +10,7 @@ const UserSchema = mongoose.Schema(
     password: { type: String },
     role: { type: String },
     status: { type: Boolean },
+    hasTeam: { type: Boolean},
     location: { type: String },
     passwordChangedAt: Date,
     passwordResetToken:  { type: String },

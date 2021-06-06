@@ -46,6 +46,7 @@ exports.signup = (req, res, next) => {
       password: hash,
       role: req.body.role,
       status: req.body.status,
+      hasTeam: req.body.hasTeam,
       location: req.body.location
     });
     user
@@ -80,6 +81,7 @@ exports.signup = (req, res, next) => {
 
 //Account activation
 exports.accountActivation = (req, res) => {
+  // console.log(req.body);
     try {
   // The base64 encoded input string
   const emailDecode = req.body.token;
