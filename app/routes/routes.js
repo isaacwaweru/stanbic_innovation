@@ -4,7 +4,10 @@ module.exports = (app) => {
   
     // Sign up a new user
     app.post("/register", users.signup);
-  
+
+    //Account activation
+    app.put("/activate", users.accountActivation);
+
     // login
     app.post("/login", users.login);
   
@@ -17,6 +20,6 @@ module.exports = (app) => {
     // reset password
     app.post('/forgotPassword', users.forgotPassword);
 
-    app.patch('/resetPassword/:token', users.resetPassword);
+    app.patch('/resetPassword', users.resetPassword);
   };
   

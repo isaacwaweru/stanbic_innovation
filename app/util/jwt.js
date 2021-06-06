@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const JWT_SIGNATURE = "stanbic"; //process.env.JWT_SIGNATURE
+const JWT_SIGNATURE = process.env.JWT_SIGNATURE; //process.env.JWT_SIGNATURE
 
 /**
  * Sign the payload to a token

@@ -45,11 +45,27 @@ exports.signup = (req, res, next) => {
       gender: req.body.gender,
       password: hash,
       role: req.body.role,
+      status: req.body.status,
       location: req.body.location
     });
     user
       .save()
       .then(() => {
+        try {
+          const emailEncode = req.body.email;
+          // Create buffer object, specifying utf8 as encoding
+          const bufferObj = Buffer.from(emailEncode, "utf8");
+          // Encode the Buffer as a base64 string
+          const encodedEmail = bufferObj.toString("base64");
+          const message = `Please activate your account. Click ${process.env.FRONTEND_URL+'/acountActivation?token='+encodedEmail}`
+           sendEmail({
+            email: req.body.email,
+            subject: 'Account Activation',
+            message
+          });
+        } catch (error) {
+          console.log(error);
+        }
         res.status(201).json({
           message: "Account created successfully!",
         });
@@ -61,6 +77,29 @@ exports.signup = (req, res, next) => {
       });
   });
 };
+
+//Account activation
+exports.accountActivation = (req, res) => {
+    try {
+  // The base64 encoded input string
+  const emailDecode = req.body.token;
+  // Create a buffer from the string
+  const bufferObj = Buffer.from(emailDecode, "base64");
+  // Encode the Buffer as a utf8 string
+  const emailDecoded = bufferObj.toString("utf8");
+  User.findOneAndUpdate({email: emailDecoded}, {$set:{status:true}}, {new: true}, (error, doc) => {
+    res.status(200).json({
+      status: 'success',
+      message: 'Account activated!'
+    });
+  });
+    } catch (error) {
+      res.status(400).json({
+        status: 'invalid',
+        message: 'Activation Failed'
+      });
+    }
+}
 
 // Retrieve and return all users from the database.
 exports.findAll = (req, res) => {
@@ -110,9 +149,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/resetPassword/${resetToken}`;
+  const resetURL = process.env.FRONTEND_URL+'/resetPassword?token='+resetToken;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
@@ -144,7 +181,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
   const hashedToken = crypto
     .createHash('sha256')
-    .update(req.params.token)
+    .update(req.body.token)
     .digest('hex');
 
   const user = await User.findOne({
@@ -154,18 +191,21 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 2) If token has not expired, and there is user, set the new password
   if (!user) {
-    return next(new AppError('Token is invalid or has expired', 400));
-  }
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
-
-  // 3) Update changedPasswordAt property for the user
-  // 4) Log the user in, send JWT
-  res.status(200).json({
-    status: 'success',
-    message: 'Token sent to email!'
+    res.status(400).json({
+    status: 'invalid',
+    message: 'This token is invalid or has expired!!'
   });
+  } else {
+    bcrypt.hash(req.body.password, 10).then((hash) => {
+      user.password = hash;
+    user.passwordResetToken =req.body.token;
+    user.passwordResetExpires = undefined;
+     user.save();
+     // 3) Update changedPasswordAt property for the user
+    res.status(200).json({
+      status: 'success',
+      message: 'Password successfully changed!'
+    });
+    });
+  }
 });
