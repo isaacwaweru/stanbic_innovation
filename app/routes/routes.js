@@ -25,9 +25,15 @@ module.exports = (app) => {
     app.patch('/resetPassword', users.resetPassword);
 
     // Team create 
-    app.post("/team", teams.createTeam);
+    app.post("/team", auth, teams.createTeam);
 
     // Teams 
-    app.get("/teams", teams.findAll);
+    app.get("/teams", auth, teams.findAll);
+
+    //Get team leads where hasTeam is false
+    app.get("/teams/noTeam", auth, teams.hasNoTeam);
+
+    // Team create 
+    app.post("/teams/member/:id", auth, teams.addMember);
   };
   

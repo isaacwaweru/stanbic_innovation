@@ -1,10 +1,20 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const TeamSchema = mongoose.Schema(
-  {
-    teamName: { type: String },
-    team_lead_id: { type: String },
-  },
+    {
+        teamName: { type: String, unique: true },
+        // Array of members
+        members: [{
+            firstname: { type: String },
+            lastname: { type: String },
+            email: { type: String },
+            gender: { type: String },
+            role: { type: String },
+            status: { type: Boolean },
+            hasTeam: { type: Boolean},
+            location: { type: String },
+            }]
+    },
   {
     timestamps: true,
   }
