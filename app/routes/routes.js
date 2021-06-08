@@ -24,16 +24,34 @@ module.exports = (app) => {
     //User reset password
     app.patch('/resetPassword', users.resetPassword);
 
+    //User update user hasTeam
+    app.patch('/updateHasTeam/:id', auth, users.updateHasTeam);
+
     // Team create 
     app.post("/team", auth, teams.createTeam);
 
     // Teams 
-    app.get("/teams", auth, teams.findAll);
+    app.get("/team", auth, teams.findAll);
 
     //Get team leads where hasTeam is false
     app.get("/teams/noTeam", auth, teams.hasNoTeam);
 
-    // Team create 
-    app.post("/teams/member/:id", auth, teams.addMember);
+    // Team add members
+    app.post("/team/member/:id", auth, teams.addMember);
+
+    //Update team name
+    app.put("/team/:id", auth, teams.updateTeam);
+
+    //Fetch team by userId
+    app.get("/team/user/:id", auth, teams.findByUserId);
+
+    //Remove member from a team
+    app.delete("/team/:id/member/:memberid/deleteref", auth, teams.removeMember);
+
+    //Search team members without hasTeam
+    app.post("/team/searchTeamMembers", auth, teams.searchHasNoTeam);
+
+    //Update team lead
+    app.patch("/team/:leadid/member/:memberid/role", auth, users.userRole);
   };
   

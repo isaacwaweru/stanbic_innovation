@@ -5,6 +5,7 @@ const TeamSchema = mongoose.Schema(
         teamName: { type: String, unique: true },
         // Array of members
         members: [{
+            user_id: { type: String },
             firstname: { type: String },
             lastname: { type: String },
             email: { type: String },

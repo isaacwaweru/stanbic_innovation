@@ -211,3 +211,45 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+//Update has team
+exports.updateHasTeam = (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.hasTeam;
+    User.findOneAndUpdate({_id: id}, {$set:{hasTeam:status}}, {new: true}, (error, doc) => {
+      res.status(200).json({
+        status: 'success',
+        message: 'Hasteam activated!'
+      });
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'invalid',
+      message: 'Status hasTeam Failed!'
+    });
+  }
+}
+
+//Update member roleStatus
+exports.userRole = (req, res) => {
+  try {
+    const teamLeadId = req.params.leadid;
+    const teamMemberId = req.params.memberid;
+    const teamLead = "Team lead";
+    const teamMember = "Team member";
+    User.findOneAndUpdate({_id: teamLeadId}, {$set:{role:teamMember}}, {new: true}, (error, doc) => {
+      User.findOneAndUpdate({_id: teamMemberId}, {$set:{role:teamLead}}, {new: true}, (error, doc) => {
+        res.status(200).json({
+          status: 'success',
+          message: 'Role activated!'
+        });
+      });
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'invalid',
+      message: 'Status hasTeam Failed!'
+    });
+  }
+}
