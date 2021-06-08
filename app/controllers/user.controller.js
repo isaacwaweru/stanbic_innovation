@@ -242,7 +242,7 @@ exports.userRole = (req, res) => {
       User.findOneAndUpdate({_id: teamMemberId}, {$set:{role:teamLead}}, {new: true}, (error, doc) => {
         res.status(200).json({
           status: 'success',
-          message: 'Role activated!'
+          message: 'Role updated!'
         });
       });
     });
