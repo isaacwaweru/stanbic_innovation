@@ -9,23 +9,36 @@ const bcrypt = require("bcrypt");
 const { stubTrue } = require("lodash");
 
 //Submit innovation
-exports.createTeam = (req, res, next) => {
-    const innovation = new Team({
+exports.submitInnovation = (req, res, next) => {
+  const innovation = new Innovation({
     innovation: req.body.innovation,
-    status:req.body.status,
-    team:req.body.team,
-    Questions:req.body.questions
-    });
-    innovation
-      .save()
-      .then(() => {
-        res.status(201).json({
-          message: "Innovation submitted successfully!",
-        });
-      })
-      .catch((error) => {
-        res.status(500).json({
-          error: error,
-        });
+    status: req.body.status,
+    team: req.body.team,
+    Questions: req.body.questions,
+  });
+  innovation
+    .save()
+    .then(() => {
+      res.status(201).json({
+        message: "Innovation submitted successfully!",
       });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        error: error,
+      });
+    });
+};
+
+// Retrieve and return all innovations from the database.
+exports.findAllInnovations = (req, res) => {
+  Innovation.find()
+    .then((innovation) => {
+      res.send(innovation);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving teams.",
+      });
+    });
 };

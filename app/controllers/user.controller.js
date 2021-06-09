@@ -1,6 +1,6 @@
 const User = require("../models/user.model.js");
 const sendEmail = require("../util/email.js");
-const crypto = require('crypto');
+const crypto = require("crypto");
 const jwt = require("../util/jwt.js");
 const AppError = require("../util/AppError.js");
 const catchAsync = require("../util/catchAsync.js");
@@ -47,7 +47,7 @@ exports.signup = (req, res, next) => {
       role: req.body.role,
       status: req.body.status,
       hasTeam: req.body.hasTeam,
-      location: req.body.location
+      location: req.body.location,
     });
     user
       .save()
@@ -58,11 +58,13 @@ exports.signup = (req, res, next) => {
           const bufferObj = Buffer.from(emailEncode, "utf8");
           // Encode the Buffer as a base64 string
           const encodedEmail = bufferObj.toString("base64");
-          const message = `Please activate your account. Click ${process.env.FRONTEND_URL+'/acountActivation?token='+encodedEmail}`
-           sendEmail({
+          const message = `Please activate your account. Click ${
+            process.env.FRONTEND_URL + "/acountActivation?token=" + encodedEmail
+          }`;
+          sendEmail({
             email: req.body.email,
-            subject: 'Account Activation',
-            message
+            subject: "Account Activation",
+            message,
           });
         } catch (error) {
           console.log(error);
@@ -82,26 +84,31 @@ exports.signup = (req, res, next) => {
 //Account activation
 exports.accountActivation = (req, res) => {
   // console.log(req.body);
-    try {
-  // The base64 encoded input string
-  const emailDecode = req.body.token;
-  // Create a buffer from the string
-  const bufferObj = Buffer.from(emailDecode, "base64");
-  // Encode the Buffer as a utf8 string
-  const emailDecoded = bufferObj.toString("utf8");
-  User.findOneAndUpdate({email: emailDecoded}, {$set:{status:true}}, {new: true}, (error, doc) => {
-    res.status(200).json({
-      status: 'success',
-      message: 'Account activated!'
+  try {
+    // The base64 encoded input string
+    const emailDecode = req.body.token;
+    // Create a buffer from the string
+    const bufferObj = Buffer.from(emailDecode, "base64");
+    // Encode the Buffer as a utf8 string
+    const emailDecoded = bufferObj.toString("utf8");
+    User.findOneAndUpdate(
+      { email: emailDecoded },
+      { $set: { status: true } },
+      { new: true },
+      (error, doc) => {
+        res.status(200).json({
+          status: "success",
+          message: "Account activated!",
+        });
+      }
+    );
+  } catch (error) {
+    res.status(400).json({
+      status: "invalid",
+      message: "Activation Failed",
     });
-  });
-    } catch (error) {
-      res.status(400).json({
-        status: 'invalid',
-        message: 'Activation Failed'
-      });
-    }
-}
+  }
+};
 
 // Retrieve and return all users from the database.
 exports.findAll = (req, res) => {
@@ -143,7 +150,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTED email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError('There is no user with email address.', 404));
+    return next(new AppError("There is no user with email address.", 404));
   }
 
   // 2) Generate the random reset token
@@ -151,30 +158,28 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
-  const resetURL = process.env.FRONTEND_URL+'/resetPassword?token='+resetToken;
+  const resetURL =
+    process.env.FRONTEND_URL + "/resetPassword?token=" + resetToken;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message
+      subject: "Your password reset token (valid for 10 min)",
+      message,
     });
 
     res.status(200).json({
-      status: 'success',
-      message: 'Token sent to email!'
+      status: "success",
+      message: "Token sent to email!",
     });
   } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
-    return next(
-      new AppError(err),
-      500
-    );
+    return next(new AppError(err), 500);
   }
 });
 
@@ -182,32 +187,32 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
   const hashedToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(req.body.token)
-    .digest('hex');
+    .digest("hex");
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    passwordResetExpires: { $gt: Date.now() },
   });
 
   // 2) If token has not expired, and there is user, set the new password
   if (!user) {
     res.status(400).json({
-    status: 'invalid',
-    message: 'This token is invalid or has expired!!'
-  });
+      status: "invalid",
+      message: "This token is invalid or has expired!!",
+    });
   } else {
     bcrypt.hash(req.body.password, 10).then((hash) => {
       user.password = hash;
-    user.passwordResetToken =req.body.token;
-    user.passwordResetExpires = undefined;
-     user.save();
-     // 3) Update changedPasswordAt property for the user
-    res.status(200).json({
-      status: 'success',
-      message: 'Password successfully changed!'
-    });
+      user.passwordResetToken = req.body.token;
+      user.passwordResetExpires = undefined;
+      user.save();
+      // 3) Update changedPasswordAt property for the user
+      res.status(200).json({
+        status: "success",
+        message: "Password successfully changed!",
+      });
     });
   }
 });
@@ -217,39 +222,81 @@ exports.updateHasTeam = (req, res) => {
   try {
     const id = req.params.id;
     const status = req.body.hasTeam;
-    User.findOneAndUpdate({_id: id}, {$set:{hasTeam:status}}, {new: true}, (error, doc) => {
-      res.status(200).json({
-        status: 'success',
-        message: 'Hasteam activated!'
-      });
-    });
+    User.findOneAndUpdate(
+      { _id: id },
+      { $set: { hasTeam: status } },
+      { new: true },
+      (error, doc) => {
+        res.status(200).json({
+          status: "success",
+          message: "Hasteam activated!",
+        });
+      }
+    );
   } catch (error) {
     res.status(400).json({
-      status: 'invalid',
-      message: 'Status hasTeam Failed!'
+      status: "invalid",
+      message: "Status hasTeam Failed!",
     });
   }
-}
+};
 
 //Update member roleStatus
 exports.userRole = (req, res) => {
   try {
+    const teamID = req.params.teamId;
     const teamLeadId = req.params.leadid;
     const teamMemberId = req.params.memberid;
     const teamLead = "Team lead";
     const teamMember = "Team member";
-    User.findOneAndUpdate({_id: teamLeadId}, {$set:{role:teamMember}}, {new: true}, (error, doc) => {
-      User.findOneAndUpdate({_id: teamMemberId}, {$set:{role:teamLead}}, {new: true}, (error, doc) => {
-        res.status(200).json({
-          status: 'success',
-          message: 'Role updated!'
-        });
-      });
-    });
+    User.findOneAndUpdate(
+      { _id: teamLeadId },
+      { $set: { role: teamMember } },
+      { new: true },
+      (error, doc) => {
+        User.findOneAndUpdate(
+          { _id: teamMemberId },
+          { $set: { role: teamLead } },
+          { new: true },
+          (error, doc) => {
+            //update team member role
+            Team.findById(teamID, (i) => {
+              //Main Target
+              let members = i.members;
+              members.find({ user_id: teamLeadId }, (j) => {
+                //assuming known (unique) target  (not sure if possible with mongoose; if not search Object key/values)
+                //Sub Target
+                j.role = teamMember;
+                j.save((err) => {
+                  Team.findById(teamID, (i) => {
+                    //Main Target
+                    let members = i.members;
+                    members.find({ user_id: teamMemberId }, (j) => {
+                      //assuming known (unique) target  (not sure if possible with mongoose; if not search Object key/values)
+                      //Sub Target
+                      j.role = teamLead;
+                      j.save((err) => {
+                        res.status(200).json({
+                          status: "success",
+                          message: "Role updated!",
+                        });
+                      });
+                    });
+                    // i.save(cb) if using Object
+                  });
+                });
+              });
+              // i.save(cb) if using Object
+            });
+            //end of team update
+          }
+        );
+      }
+    );
   } catch (error) {
     res.status(400).json({
-      status: 'invalid',
-      message: 'Status hasTeam Failed!'
+      status: "invalid",
+      message: "Status hasTeam Failed!",
     });
   }
-}
+};

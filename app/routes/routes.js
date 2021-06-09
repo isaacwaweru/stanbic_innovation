@@ -1,57 +1,66 @@
 module.exports = (app) => {
-    const auth = require("../middleware/auth.js");
-    const users = require("../controllers/user.controller.js");
-    const teams = require("../controllers/team.controller.js");
-  
-    // User sign up
-    app.post("/register", users.signup);
+  const auth = require("../middleware/auth.js");
+  const users = require("../controllers/user.controller.js");
+  const teams = require("../controllers/team.controller.js");
+  const innovations = require("../controllers/innovation.controller.js");
+  // User sign up
+  app.post("/register", users.signup);
 
-    //User account activation
-    app.put("/activate", users.accountActivation);
+  //User account activation
+  app.put("/activate", users.accountActivation);
 
-    // user login
-    app.post("/login", users.login);
-  
-    // Retrieve all users
-    app.get("/users", auth, users.findAll);
-  
-    // Retrieve a single user with usersId
-    app.get("/users/:userId", auth, users.findOne);
+  // user login
+  app.post("/login", users.login);
 
-    // User forgot password
-    app.post('/forgotPassword', users.forgotPassword);
+  // Retrieve all users
+  app.get("/users", auth, users.findAll);
 
-    //User reset password
-    app.patch('/resetPassword', users.resetPassword);
+  // Retrieve a single user with usersId
+  app.get("/users/:userId", auth, users.findOne);
 
-    //User update user hasTeam
-    app.patch('/updateHasTeam/:id', auth, users.updateHasTeam);
+  // User forgot password
+  app.post("/forgotPassword", users.forgotPassword);
 
-    // Team create 
-    app.post("/team", auth, teams.createTeam);
+  //User reset password
+  app.patch("/resetPassword", users.resetPassword);
 
-    // Teams 
-    app.get("/team", auth, teams.findAll);
+  //User update user hasTeam
+  app.patch("/updateHasTeam/:id", auth, users.updateHasTeam);
 
-    //Get team leads where hasTeam is false
-    app.get("/teams/noTeam", auth, teams.hasNoTeam);
+  // Team create
+  app.post("/team", auth, teams.createTeam);
 
-    // Team add members
-    app.post("/team/member/:id", auth, teams.addMember);
+  // Teams
+  app.get("/team", auth, teams.findAll);
 
-    //Update team name
-    app.put("/team/:id", auth, teams.updateTeam);
+  //Get team leads where hasTeam is false
+  app.get("/teams/noTeam", auth, teams.hasNoTeam);
 
-    //Fetch team by userId
-    app.get("/team/user/:id", auth, teams.findByUserId);
+  // Team add members
+  app.post("/team/member/:id", auth, teams.addMember);
 
-    //Remove member from a team
-    app.delete("/team/:id/member/:memberid/deleteref", auth, teams.removeMember);
+  //Update team name
+  app.put("/team/:id", auth, teams.updateTeam);
 
-    //Search team members without hasTeam
-    app.post("/team/searchTeamMembers", auth, teams.searchHasNoTeam);
+  //Fetch team by userId
+  app.get("/team/user/:id", auth, teams.findByUserId);
 
-    //Update team lead
-    app.patch("/team/:leadid/member/:memberid/role", auth, users.userRole);
-  };
-  
+  //Remove member from a team
+  app.delete("/team/:id/member/:memberid/deleteref", auth, teams.removeMember);
+
+  //Search team members without hasTeam
+  app.post("/team/searchTeamMembers", auth, teams.searchHasNoTeam);
+
+  //Update team lead
+  app.patch(
+    "/team/:teamId/teamlead/:leadid/member/:memberid/role",
+    auth,
+    users.userRole
+  );
+
+  //Submit innovation
+  app.post("/innovation", auth, innovations.submitInnovation);
+
+  //Fetch all innovations
+  app.get("/innovation", auth, innovations.findAllInnovations);
+};
