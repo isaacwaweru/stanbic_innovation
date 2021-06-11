@@ -1,4 +1,5 @@
 const User = require("../models/user.model.js");
+const Team = require("../models/team.model.js");
 const sendEmail = require("../util/email.js");
 const crypto = require("crypto");
 const jwt = require("../util/jwt.js");
@@ -242,9 +243,9 @@ exports.updateHasTeam = (req, res) => {
 };
 
 //Update member roleStatus
-exports.userRole = (req, res) => {
+exports.memberRole = (req, res) => {
   try {
-    const teamID = req.params.teamId;
+    const teamID = req.params.teamid;
     const teamLeadId = req.params.leadid;
     const teamMemberId = req.params.memberid;
     const teamLead = "Team lead";
@@ -259,38 +260,36 @@ exports.userRole = (req, res) => {
           { $set: { role: teamLead } },
           { new: true },
           (error, doc) => {
-            //update team member role
-            Team.findById(teamID, (i) => {
-              //Main Target
-              let members = i.members;
-              members.find({ user_id: teamLeadId }, (j) => {
-                //assuming known (unique) target  (not sure if possible with mongoose; if not search Object key/values)
-                //Sub Target
-                j.role = teamMember;
-                j.save((err) => {
-                  Team.findById(teamID, (i) => {
-                    //Main Target
-                    let members = i.members;
-                    members.find({ user_id: teamMemberId }, (j) => {
-                      //assuming known (unique) target  (not sure if possible with mongoose; if not search Object key/values)
-                      //Sub Target
-                      j.role = teamLead;
-                      j.save((err) => {
-                        res.status(200).json({
-                          status: "success",
-                          message: "Role updated!",
-                        });
-                      });
-                    });
-                    // i.save(cb) if using Object
-                  });
-                });
-              });
-              // i.save(cb) if using Object
+            res.status(200).json({
+              status: "success",
+              message: "Role updated!",
             });
-            //end of team update
           }
         );
+      }
+    );
+  } catch (error) {
+    res.status(400).json({
+      status: "invalid",
+      message: "Status hasTeam Failed!",
+    });
+  }
+};
+
+//Update user roleStatus
+exports.userRole = (req, res) => {
+  try {
+    const userId = req.params.userid;
+    console.log(userId);
+    User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { role: req.body.userRole } },
+      { new: true },
+      (error, doc) => {
+        res.status(200).json({
+          status: "success",
+          message: "Role updated!",
+        });
       }
     );
   } catch (error) {

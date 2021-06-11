@@ -14,7 +14,7 @@ exports.submitInnovation = (req, res, next) => {
     innovation: req.body.innovation,
     status: req.body.status,
     team: req.body.team,
-    Questions: req.body.questions,
+    Questions: req.body.question,
   });
   innovation
     .save()
@@ -41,4 +41,54 @@ exports.findAllInnovations = (req, res) => {
         message: err.message || "Some error occurred while retrieving teams.",
       });
     });
+};
+
+//Submit innovation
+exports.submitInnovationQuestion = async (req, res) => {
+  const innovation = await Innovation.findOne({ _id: req.params.id });
+  innovation.Questions.push(req.body);
+  const response = await innovation
+    .save()
+    .then(() => {
+      res.status(200).json({
+        message: "Innovation submitted successfully!",
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        error: error,
+      });
+    });
+};
+
+//Innovations reviews
+exports.innovationsReview = async (req, res) => {
+  // Innovation.find({ _id: req.params.id })
+  //   .then(function (innovation) {
+  //     console.log(innovation[0].Questions[0].Judges);
+  //     const Judges = innovation[0].Questions[0].Judges;
+  //     Judges.push(req.body);
+  //   })
+  //find the user first, then add the post to it
+  Innovation.findById(req.params.id, function(err, result) {
+    if (!err) {
+      if (!result){
+        res.sendStatus(404).send('Innovation was not found').end();
+      }
+      else{
+        console.log(result.Questions[0].Judges)
+        result.Questions[0].Judges.push(req.body);
+        result.markModified('innovations'); 
+        result.save(function(saveerr, saveresult) {
+          if (!saveerr) {
+            res.status(200).send(saveresult);
+          } else {
+            res.status(400).send(saveerr.message);
+          }
+        });
+      }
+    } else {
+      res.status(400).send(err.message);
+    }
+  });
 };

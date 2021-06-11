@@ -27,6 +27,9 @@ module.exports = (app) => {
   //User update user hasTeam
   app.patch("/updateHasTeam/:id", auth, users.updateHasTeam);
 
+  //update user role
+  app.patch("/user/role/:userid", auth, users.userRole);
+
   // Team create
   app.post("/team", auth, teams.createTeam);
 
@@ -51,11 +54,11 @@ module.exports = (app) => {
   //Search team members without hasTeam
   app.post("/team/searchTeamMembers", auth, teams.searchHasNoTeam);
 
-  //Update team lead
+  //Update user role
   app.patch(
-    "/team/:teamId/teamlead/:leadid/member/:memberid/role",
+    "/team/teamlead/:leadid/member/:memberid/role",
     auth,
-    users.userRole
+    users.memberRole
   );
 
   //Submit innovation
@@ -63,4 +66,10 @@ module.exports = (app) => {
 
   //Fetch all innovations
   app.get("/innovation", auth, innovations.findAllInnovations);
+
+  //Submit innovation
+  app.post("/innovation/submit/:id/", auth, innovations.submitInnovationQuestion);
+
+  //Points award
+  app.post("/innovation/rate/:id", auth, innovations.innovationsReview);
 };

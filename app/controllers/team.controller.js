@@ -99,9 +99,6 @@ exports.createTeam = (req, res, next) => {
     })
 
     })
-    .catch(function(err) {
-      return handleError(res, err);
-    });
   }
 
   // Retrieve and return all teams from the database.
