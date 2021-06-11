@@ -56,7 +56,7 @@ module.exports = (app) => {
 
   //Update user role
   app.patch(
-    "/team/teamlead/:leadid/member/:memberid/role",
+    "/team/:teamid/teamlead/:leadid/member/:memberid/role",
     auth,
     users.memberRole
   );
@@ -68,7 +68,11 @@ module.exports = (app) => {
   app.get("/innovation", auth, innovations.findAllInnovations);
 
   //Submit innovation
-  app.post("/innovation/submit/:id/", auth, innovations.submitInnovationQuestion);
+  app.post(
+    "/innovation/submit/:id/",
+    auth,
+    innovations.submitInnovationQuestion
+  );
 
   //Points award
   app.post("/innovation/rate/:id", auth, innovations.innovationsReview);

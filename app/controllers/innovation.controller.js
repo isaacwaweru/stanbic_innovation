@@ -63,23 +63,15 @@ exports.submitInnovationQuestion = async (req, res) => {
 
 //Innovations reviews
 exports.innovationsReview = async (req, res) => {
-  // Innovation.find({ _id: req.params.id })
-  //   .then(function (innovation) {
-  //     console.log(innovation[0].Questions[0].Judges);
-  //     const Judges = innovation[0].Questions[0].Judges;
-  //     Judges.push(req.body);
-  //   })
-  //find the user first, then add the post to it
-  Innovation.findById(req.params.id, function(err, result) {
+  Innovation.findById(req.params.id, function (err, result) {
     if (!err) {
-      if (!result){
-        res.sendStatus(404).send('Innovation was not found').end();
-      }
-      else{
-        console.log(result.Questions[0].Judges)
+      if (!result) {
+        res.sendStatus(404).send("Innovation was not found").end();
+      } else {
+        console.log(result.Questions[0].Judges);
         result.Questions[0].Judges.push(req.body);
-        result.markModified('innovations'); 
-        result.save(function(saveerr, saveresult) {
+        result.markModified("innovations");
+        result.save(function (saveerr, saveresult) {
           if (!saveerr) {
             res.status(200).send(saveresult);
           } else {
