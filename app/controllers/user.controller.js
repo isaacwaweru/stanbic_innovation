@@ -266,12 +266,9 @@ exports.memberRole = (req, res) => {
               const mem = team[0].members.filter(function (el) {
                 return el.user_id === teamLeadId;
               });
-              console.log(mem[0]);
-              const user_Id = mem[0].user_id;
-              console.log(user_Id);
+              const user_Id = mem[0]._id;
               const memberObject = mem[0];
               memberObject["role"] = teamMember;
-              console.log(memberObject);
               Team.findById(teamID, function (err, member) {
                 if (err) {
                   return console.log(err);
@@ -282,18 +279,19 @@ exports.memberRole = (req, res) => {
                   if (err) {
                     return console.log(err);
                   }
+                  res.status(200).json({
+                    status: "success",
+                    message: "Role updated!",
+                  });
                   //Team member update
                   Team.find({ _id: teamID }).then(function (team2) {
                     // console.log(team[0].members);
                     const mem2 = team2[0].members.filter(function (el) {
                       return el.user_id === teamMemberId;
                     });
-                    console.log(mem2[0]);
-                    const user_Id_Member = mem2[0].user_id;
-                    console.log(user_Id);
+                    const user_Id_Member = mem2[0]._id;
                     const memberObjectMember = mem2[0];
                     memberObjectMember["role"] = teamLead;
-                    console.log(memberObjectMember);
                     Team.findById(teamID, function (err, member) {
                       if (err) {
                         return console.log(err);
