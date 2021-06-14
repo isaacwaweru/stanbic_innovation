@@ -64,16 +64,26 @@ module.exports = (app) => {
   //Submit innovation
   app.post("/innovation", auth, innovations.submitInnovation);
 
-  //Fetch all innovations
+  // //Fetch all innovations
   app.get("/innovation", auth, innovations.findAllInnovations);
 
-  //Submit innovation
-  app.post(
-    "/innovation/submit/:id/",
-    auth,
-    innovations.submitInnovationQuestion
-  );
+  // //Fetch innovation by team id
+  app.get("/innovation/:id", auth, innovations.findByTeamId);
 
-  //Points award
-  app.post("/innovation/rate/:id", auth, innovations.innovationsReview);
+  // //Fetch complete innovation
+  app.get("/innovation/complete/:id", auth, innovations.completeInnovation);
+  
+
+   // Update innovation by Id
+   app.put("/innovation/update/:innovationId", auth, innovations.updateInnovation);
+
+  // //Submit innovation
+  // app.post(
+  //   "/innovation/submit/:id/",
+  //   auth,
+  //   innovations.submitInnovationQuestion
+  // );
+
+  // //Points award
+  // app.post("/innovation/rate/:id", auth, innovations.innovationsReview);
 };

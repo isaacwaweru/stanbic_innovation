@@ -11,10 +11,13 @@ const { stubTrue } = require("lodash");
 //Submit innovation
 exports.submitInnovation = (req, res, next) => {
   const innovation = new Innovation({
-    innovation: req.body.innovation,
+    title: req.body.title,
+    category: req.body.category,
+    problem: req.body.problem,
+    proposedSolution: req.body.proposedSolution,
     status: req.body.status,
-    team: req.body.team,
-    Questions: req.body.question,
+    teamId: req.body.teamId,
+    judges: req.body.judges
   });
   innovation
     .save()
@@ -42,6 +45,53 @@ exports.findAllInnovations = (req, res) => {
       });
     });
 };
+
+//Fetch innovation by userId
+exports.findByTeamId = (req, res) => {
+  const id = req.params.id;
+  Innovation.find({ "teamId": id})
+.then(function(team) {
+  return res.status(200).json(team);
+})
+.catch(function(err) {
+  return handleError(res, err);
+});
+}
+
+//Update innovation
+exports.updateInnovation = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
+  const id = req.params.innovationId;
+  Innovation.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Innovation with id=${id}. Maybe Innovation was not found!`
+        });
+      } else res.send({ message: "Innovation was updated successfully." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Innovation with id=" + id
+      });
+    });
+}
+
+//Fetch complete innovation
+exports.completeInnovation = (req, res) => {
+  const id = req.params.id;
+  Innovation.find({ "status": id})
+.then(function(team) {
+  return res.status(200).json(team);
+})
+.catch(function(err) {
+  return handleError(res, err);
+});
+}
 
 //Submit innovation
 exports.submitInnovationQuestion = async (req, res) => {

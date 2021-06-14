@@ -276,13 +276,6 @@ exports.memberRole = (req, res) => {
                 member.members.pull(user_Id);
                 member.members.push(memberObject);
                 member.save(function (err, editedMembers) {
-                  if (err) {
-                    return console.log(err);
-                  }
-                  res.status(200).json({
-                    status: "success",
-                    message: "Role updated!",
-                  });
                   //Team member update
                   Team.find({ _id: teamID }).then(function (team2) {
                     // console.log(team[0].members);
@@ -301,11 +294,12 @@ exports.memberRole = (req, res) => {
                       member.save(function (err, editedMembers) {
                         if (err) {
                           return console.log(err);
+                        }else {
+                          return res.status(200).json({
+                            status: "success",
+                            message: "Role updated!",
+                          });
                         }
-                        res.status(200).json({
-                          status: "success",
-                          message: "Role updated!",
-                        });
                       });
                     });
                   });
