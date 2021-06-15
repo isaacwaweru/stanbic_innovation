@@ -17,6 +17,7 @@ exports.submitInnovation = (req, res, next) => {
     proposedSolution: req.body.proposedSolution,
     status: req.body.status,
     teamId: req.body.teamId,
+    comment: req.body.comment,
     judges: req.body.judges,
   });
   innovation
