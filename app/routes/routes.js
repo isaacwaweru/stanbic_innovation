@@ -3,6 +3,7 @@ module.exports = (app) => {
   const users = require("../controllers/user.controller.js");
   const teams = require("../controllers/team.controller.js");
   const innovations = require("../controllers/innovation.controller.js");
+  const logs = require("../controllers/logs.controller.js");
   // User sign up
   app.post("/register", users.signup);
 
@@ -72,18 +73,17 @@ module.exports = (app) => {
 
   // //Fetch complete innovation
   app.get("/innovation/complete/:id", auth, innovations.completeInnovation);
-  
 
-   // Update innovation by Id
-   app.put("/innovation/update/:innovationId", auth, innovations.updateInnovation);
+  // Update innovation by Id
+  app.put(
+    "/innovation/update/:innovationId",
+    auth,
+    innovations.updateInnovation
+  );
 
-  // //Submit innovation
-  // app.post(
-  //   "/innovation/submit/:id/",
-  //   auth,
-  //   innovations.submitInnovationQuestion
-  // );
+  //Add logs
+  app.post("/logs", auth, logs.createLog);
 
-  // //Points award
-  // app.post("/innovation/rate/:id", auth, innovations.innovationsReview);
+  //Retrieve all logs
+  app.get("/logs", auth, logs.findAllLogs);
 };
